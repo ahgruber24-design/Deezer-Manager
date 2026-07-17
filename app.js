@@ -1,6 +1,7 @@
 // js/app.js
 import { initAuth, logout } from './auth.js';
 import { initSearch } from './ui.js';
+import { initSearch, initMyAlbums } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
@@ -8,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('btn-logout').addEventListener('click', logout);
     document.getElementById('btn-search').addEventListener('click', initSearch);
+    document.getElementById('btn-my-albums').addEventListener('click', initMyAlbums);
     
     const token = localStorage.getItem('authToken');
     if (token) {

@@ -1,6 +1,6 @@
 // js/ui.js
 import { searchArtist, getArtistAlbums } from './api.js';
-import { toggleFavorite } from './storage.js';
+import { toggleFavorite, getFavorites, rateAlbum } from './storage.js';
 
 /**
  * Inicializa y renderiza la vista del buscador en el contenedor principal.
@@ -22,9 +22,6 @@ export function initSearch() {
     document.getElementById('search-form').addEventListener('submit', handleSearch);
 }
 
-/**
- * Maneja el evento de búsqueda, controla el spinner y los estados vacíos.
- */
 async function handleSearch(event) {
     event.preventDefault();
     
@@ -32,17 +29,13 @@ async function handleSearch(event) {
     const spinner = document.getElementById('global-spinner');
     const resultsContainer = document.getElementById('results-container');
 
-    // Limpiar resultados previos y mostrar el spinner
     resultsContainer.innerHTML = '';
     spinner.classList.remove('hidden');
 
-    // Realizar petición asíncrona a la API
     const results = await searchArtist(query);
 
-    // Ocultar el spinner al recibir respuesta
     spinner.classList.add('hidden');
 
-    // Gestión de estados vacíos (Resultados no encontrados)
     if (!results || results.length === 0) {
         resultsContainer.innerHTML = `
             <div class="empty-state">
@@ -53,13 +46,9 @@ async function handleSearch(event) {
         return;
     }
 
-    // Renderizar los resultados si existen
     renderArtists(results, resultsContainer);
 }
 
-/**
- * Genera el HTML semántico para presentar los artistas encontrados.
- */
 function renderArtists(artists, container) {
     const html = artists.map(artist => `
         <div class="artist-card">
@@ -71,7 +60,6 @@ function renderArtists(artists, container) {
 
     container.innerHTML = html;
     
-    // Añadir eventos a los botones de "Ver Detalle"
     const detailButtons = document.querySelectorAll('.btn-detail');
     detailButtons.forEach(button => {
         button.addEventListener('click', (e) => {
@@ -82,9 +70,6 @@ function renderArtists(artists, container) {
     });
 }
 
-/**
- * Carga y renderiza el panel de detalle de un artista (sus álbumes).
- */
 async function loadArtistDetail(artistId, artistName) {
     const appContainer = document.getElementById('app-container');
     const spinner = document.getElementById('global-spinner');
@@ -97,9 +82,7 @@ async function loadArtistDetail(artistId, artistName) {
         <div class="detail-section">
             <button id="btn-back" class="btn-secondary">⬅ Volver al Buscador</button>
             <h2>Discografía de ${artistName}</h2>
-            <div id="albums-container" class="results-container">
-                <!-- Los álbumes irán aquí -->
-            </div>
+            <div id="albums-container" class="results-container"></div>
         </div>
     `;
 
@@ -115,9 +98,6 @@ async function loadArtistDetail(artistId, artistName) {
     renderAlbums(albums, albumsContainer);
 }
 
-/**
- * Genera el HTML para las tarjetas de los álbumes y vincula los eventos.
- */
 function renderAlbums(albums, container) {
     const html = albums.map(album => `
         <div class="album-card">
@@ -133,18 +113,113 @@ function renderAlbums(albums, container) {
 
     container.innerHTML = html;
 
-    // Conectar el botón de Guardar en Favoritos
     const favButtons = document.querySelectorAll('.btn-fav');
     favButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            // Extraer los datos del dataset del botón
             const albumData = {
                 id: e.target.getAttribute('data-id'),
                 title: e.target.getAttribute('data-title'),
                 cover_medium: e.target.getAttribute('data-cover')
             };
-            // Llamar a nuestra función de guardado
             toggleFavorite(albumData);
+        });
+    });
+}
+
+/**
+ * Inicializa la vista de Mis Álbumes (Colección Privada).
+ */
+export function initMyAlbums() {
+    const appContainer = document.getElementById('app-container');
+    
+    appContainer.innerHTML = `
+        <div class="detail-section">
+            <h2>Mis Álbumes Guardados</h2>
+            <div class="filter-section">
+                <label for="rating-filter">Filtrar por calificación:</label>
+                <select id="rating-filter">
+                    <option value="all">Todas</option>
+                    <option value="5">5 Estrellas</option>
+                    <option value="4">4 Estrellas</option>
+                    <option value="3">3 Estrellas</option>
+                    <option value="2">2 Estrellas</option>
+                    <option value="1">1 Estrella</option>
+                    <option value="0">Sin calificar</option>
+                </select>
+            </div>
+            <div id="favorites-container" class="results-container"></div>
+        </div>
+    `;
+
+    const filterSelect = document.getElementById('rating-filter');
+    filterSelect.addEventListener('change', (e) => {
+        renderFavorites(e.target.value);
+    });
+
+    // Renderizar todos los favoritos inicialmente
+    renderFavorites('all');
+}
+
+/**
+ * Renderiza los álbumes favoritos con base en un filtro de calificación.
+ */
+function renderFavorites(filterValue) {
+    const container = document.getElementById('favorites-container');
+    let favorites = getFavorites();
+
+    // Aplicar filtro si no es "all"
+    if (filterValue !== 'all') {
+        favorites = favorites.filter(fav => String(fav.rating) === String(filterValue));
+    }
+
+    if (favorites.length === 0) {
+        container.innerHTML = `<p class="empty-state">No hay álbumes que coincidan con este criterio.</p>`;
+        return;
+    }
+
+    const html = favorites.map(album => {
+        // Generar las 5 estrellas dinámicamente
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+            const isFilled = i <= (album.rating || 0) ? 'filled' : '';
+            starsHtml += `<span class="star ${isFilled}" data-id="${album.id}" data-val="${i}">★</span>`;
+        }
+
+        return `
+            <div class="album-card">
+                <img src="${album.cover_medium}" alt="${album.title}">
+                <h4>${album.title}</h4>
+                <div class="rating-container">
+                    ${starsHtml}
+                </div>
+                <div class="album-actions">
+                    <button class="btn-tracks" data-id="${album.id}">Ver Canciones</button>
+                    <button class="btn-fav btn-remove" data-id="${album.id}">❌ Eliminar</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+
+    // Eventos para eliminar de favoritos
+    const removeButtons = document.querySelectorAll('.btn-remove');
+    removeButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const albumId = e.target.getAttribute('data-id');
+            toggleFavorite({ id: albumId }); // Esto lo eliminará
+            renderFavorites(document.getElementById('rating-filter').value); // Refrescar vista
+        });
+    });
+
+    // Eventos para calificar con estrellas
+    const stars = document.querySelectorAll('.star');
+    stars.forEach(star => {
+        star.addEventListener('click', (e) => {
+            const albumId = e.target.getAttribute('data-id');
+            const ratingValue = parseInt(e.target.getAttribute('data-val'));
+            rateAlbum(albumId, ratingValue);
+            renderFavorites(document.getElementById('rating-filter').value); // Refrescar vista
         });
     });
 }
