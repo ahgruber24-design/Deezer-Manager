@@ -1,5 +1,5 @@
 // js/ui.js
-import { searchArtist, getArtistAlbums } from './api.js';
+import { searchArtist, getArtistAlbums, getAlbumTracks } from './api.js';
 import { toggleFavorite, getFavorites, rateAlbum } from './storage.js';
 
 /**
@@ -113,6 +113,7 @@ function renderAlbums(albums, container) {
 
     container.innerHTML = html;
 
+    // Conectar botón de Guardar en Favoritos
     const favButtons = document.querySelectorAll('.btn-fav');
     favButtons.forEach(button => {
         button.addEventListener('click', (e) => {
@@ -124,11 +125,62 @@ function renderAlbums(albums, container) {
             toggleFavorite(albumData);
         });
     });
+
+    // Conectar botón para Ver Canciones
+    const trackButtons = document.querySelectorAll('.btn-tracks');
+    trackButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const albumId = e.target.getAttribute('data-id');
+            loadAlbumTracks(albumId);
+        });
+    });
 }
 
 /**
- * Inicializa la vista de Mis Álbumes (Colección Privada).
+ * Carga y renderiza el listado de canciones (tracks) de un álbum específico y su reproductor.
  */
+async function loadAlbumTracks(albumId) {
+    const appContainer = document.getElementById('app-container');
+    const spinner = document.getElementById('global-spinner');
+
+    spinner.classList.remove('hidden');
+    const tracks = await getAlbumTracks(albumId);
+    spinner.classList.add('hidden');
+
+    appContainer.innerHTML = `
+        <div class="detail-section">
+            <button id="btn-back-tracks" class="btn-secondary">⬅ Volver</button>
+            <h2>Lista de Reproducción</h2>
+            <div id="tracks-container" class="tracks-list"></div>
+        </div>
+    `;
+
+    // Por simplicidad, el botón de volver en esta vista regresa al buscador principal
+    document.getElementById('btn-back-tracks').addEventListener('click', initSearch);
+
+    const tracksContainer = document.getElementById('tracks-container');
+    
+    if (!tracks || tracks.length === 0) {
+        tracksContainer.innerHTML = `<p class="empty-state">No se encontraron canciones para este álbum.</p>`;
+        return;
+    }
+
+    // Renderizar las pistas con su respectivo reproductor de audio
+    const html = tracks.map(track => `
+        <div class="track-item">
+            <div class="track-info">
+                <strong>${track.track_position}. ${track.title}</strong>
+                <span>${(track.duration / 60).toFixed(2)} min</span>
+            </div>
+            <audio controls src="${track.preview}" class="audio-player">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+        </div>
+    `).join('');
+
+    tracksContainer.innerHTML = html;
+}
+
 export function initMyAlbums() {
     const appContainer = document.getElementById('app-container');
     
@@ -156,18 +208,13 @@ export function initMyAlbums() {
         renderFavorites(e.target.value);
     });
 
-    // Renderizar todos los favoritos inicialmente
     renderFavorites('all');
 }
 
-/**
- * Renderiza los álbumes favoritos con base en un filtro de calificación.
- */
 function renderFavorites(filterValue) {
     const container = document.getElementById('favorites-container');
     let favorites = getFavorites();
 
-    // Aplicar filtro si no es "all"
     if (filterValue !== 'all') {
         favorites = favorites.filter(fav => String(fav.rating) === String(filterValue));
     }
@@ -178,7 +225,6 @@ function renderFavorites(filterValue) {
     }
 
     const html = favorites.map(album => {
-        // Generar las 5 estrellas dinámicamente
         let starsHtml = '';
         for (let i = 1; i <= 5; i++) {
             const isFilled = i <= (album.rating || 0) ? 'filled' : '';
@@ -202,24 +248,31 @@ function renderFavorites(filterValue) {
 
     container.innerHTML = html;
 
-    // Eventos para eliminar de favoritos
     const removeButtons = document.querySelectorAll('.btn-remove');
     removeButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const albumId = e.target.getAttribute('data-id');
-            toggleFavorite({ id: albumId }); // Esto lo eliminará
-            renderFavorites(document.getElementById('rating-filter').value); // Refrescar vista
+            toggleFavorite({ id: albumId });
+            renderFavorites(document.getElementById('rating-filter').value);
         });
     });
 
-    // Eventos para calificar con estrellas
     const stars = document.querySelectorAll('.star');
     stars.forEach(star => {
         star.addEventListener('click', (e) => {
             const albumId = e.target.getAttribute('data-id');
             const ratingValue = parseInt(e.target.getAttribute('data-val'));
             rateAlbum(albumId, ratingValue);
-            renderFavorites(document.getElementById('rating-filter').value); // Refrescar vista
+            renderFavorites(document.getElementById('rating-filter').value); 
+        });
+    });
+
+    // Conectar botón de Ver Canciones en la vista de Favoritos
+    const trackButtons = document.querySelectorAll('.btn-tracks');
+    trackButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const albumId = e.target.getAttribute('data-id');
+            loadAlbumTracks(albumId);
         });
     });
 }

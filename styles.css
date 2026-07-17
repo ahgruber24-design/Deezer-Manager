@@ -143,3 +143,61 @@
     background-color: #e74c3c;
     color: white;
 }
+/* Estilos de la Lista de Reproducción de Canciones */
+.tracks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.track-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--header-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+/* Modificadores responsivos para las pistas */
+@media (min-width: 600px) {
+    .track-item {
+        flex-direction: row;
+    }
+}
+
+.track-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 600px) {
+    .track-info {
+        margin-bottom: 0;
+    }
+}
+
+.track-info strong {
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.track-info span {
+    font-size: 0.9rem;
+    color: gray;
+    margin-top: 5px;
+}
+
+.audio-player {
+    width: 100%;
+    max-width: 300px;
+    outline: none;
+}
