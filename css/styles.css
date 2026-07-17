@@ -1,0 +1,509 @@
+/* ============================================
+   VARIABLES DE TEMA (CLARO / OSCURO)
+   ============================================ */
+
+/* Modo Claro (por defecto) */
+.light-mode {
+    --bg-color: #f4f6f8;
+    --text-color: #1a1a2e;
+    --header-bg: #ffffff;
+    --primary-color: #a855f7;
+    --primary-hover: #9333ea;
+    --border-color: #e0e0e0;
+    --card-shadow: rgba(0, 0, 0, 0.08);
+    --input-bg: #ffffff;
+    --spinner-track: #e0e0e0;
+}
+
+/* Modo Oscuro */
+.dark-mode {
+    --bg-color: #0f0f1a;
+    --text-color: #e2e8f0;
+    --header-bg: #1a1a2e;
+    --primary-color: #a855f7;
+    --primary-hover: #c084fc;
+    --border-color: #2d2d44;
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    --input-bg: #1a1a2e;
+    --spinner-track: #2d2d44;
+}
+
+/* ============================================
+   ESTILOS BASE GLOBALES
+   ============================================ */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* ============================================
+   HEADER Y NAVEGACIÓN
+   ============================================ */
+
+header {
+    background-color: var(--header-bg);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--card-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    letter-spacing: 1px;
+}
+
+nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   BOTONES GLOBALES
+   ============================================ */
+
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: white;
+    background-color: var(--primary-color);
+    transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--card-shadow);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#theme-toggle {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    padding: 8px 14px;
+}
+
+#theme-toggle:hover {
+    background-color: var(--border-color);
+}
+
+/* ============================================
+   UTILIDADES
+   ============================================ */
+
+.hidden {
+    display: none !important;
+}
+
+/* ============================================
+   SPINNER GLOBAL
+   ============================================ */
+
+#global-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    backdrop-filter: blur(4px);
+}
+
+#global-spinner p {
+    color: white;
+    margin-top: 1rem;
+    font-size: 1.1rem;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--spinner-track, #e0e0e0);
+    border-top: 5px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   LOGIN
+   ============================================ */
+
+.login-wrapper {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 2.5rem;
+    background-color: var(--header-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 20px var(--card-shadow);
+}
+
+.login-wrapper h2 {
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.login-wrapper p {
+    margin-bottom: 1.5rem;
+    color: gray;
+    font-size: 0.95rem;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: var(--input-bg, var(--bg-color));
+    color: var(--text-color);
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+}
+
+#btn-submit {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.05rem;
+    margin-top: 0.5rem;
+}
+
+/* ============================================
+   BUSCADOR Y RESULTADOS
+   ============================================ */
+
+.search-section {
+    padding: 2rem;
+    text-align: center;
+}
+
+.search-form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 2rem;
+}
+
+.search-form input {
+    width: 300px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--input-bg, var(--bg-color));
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.search-form input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+}
+
+.results-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 1rem 0;
+}
+
+.artist-card {
+    background-color: var(--header-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.artist-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px var(--card-shadow);
+}
+
+.artist-card img {
+    width: 100%;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    padding: 3rem;
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    color: gray;
+    text-align: center;
+}
+
+/* ============================================
+   DETALLE Y ÁLBUMES
+   ============================================ */
+
+.detail-section {
+    padding: 2rem;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.album-card {
+    background-color: var(--header-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.album-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px var(--card-shadow);
+}
+
+.album-card img {
+    width: 100%;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.album-card h4 {
+    margin: 10px 0 5px 0;
+    font-size: 1.1rem;
+}
+
+.album-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.btn-tracks {
+    background-color: #555;
+}
+
+.btn-tracks:hover {
+    background-color: #444;
+}
+
+.btn-fav {
+    background-color: #f39c12;
+}
+
+.btn-fav:hover {
+    background-color: #e67e22;
+}
+
+/* ============================================
+   FILTRO DE CALIFICACIONES
+   ============================================ */
+
+.filter-section {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.filter-section select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg, var(--bg-color));
+    color: var(--text-color);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+/* ============================================
+   SISTEMA DE ESTRELLAS
+   ============================================ */
+
+.rating-container {
+    margin: 10px 0;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.star {
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.15s;
+}
+
+.star:hover {
+    color: #f39c12;
+    transform: scale(1.2);
+}
+
+.star.filled {
+    color: #f39c12;
+}
+
+.btn-remove {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-remove:hover {
+    background-color: #c0392b;
+}
+
+/* ============================================
+   LISTA DE REPRODUCCIÓN DE CANCIONES
+   ============================================ */
+
+.tracks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.track-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--header-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+@media (min-width: 600px) {
+    .track-item {
+        flex-direction: row;
+    }
+}
+
+.track-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 600px) {
+    .track-info {
+        margin-bottom: 0;
+    }
+}
+
+.track-info strong {
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.track-info span {
+    font-size: 0.9rem;
+    color: gray;
+    margin-top: 5px;
+}
+
+.audio-player {
+    width: 100%;
+    max-width: 300px;
+    outline: none;
+}
+
+/* ============================================
+   INDICADOR OFFLINE
+   ============================================ */
+
+.offline-mode::after {
+    content: '📡 Sin conexión — los cambios se guardarán localmente';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    background-color: #e74c3c;
+    color: white;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    z-index: 1000;
+}
