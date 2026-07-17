@@ -1,11 +1,12 @@
 // js/app.js
 import { initAuth, logout } from './auth.js';
-import { initSearch } from './ui.js';
 import { initSearch, initMyAlbums } from './ui.js';
+import { syncPendingRatings } from './storage.js'; // Importamos el sincronizador
 
 document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
     registerServiceWorker();
+    setupNetworkListeners(); // Inicializar monitoreo de red
     
     document.getElementById('btn-logout').addEventListener('click', logout);
     document.getElementById('btn-search').addEventListener('click', initSearch);
@@ -19,6 +20,21 @@ document.addEventListener('DOMContentLoaded', () => {
         initAuth();
     }
 });
+
+/**
+ * Escucha los cambios de conexión a internet para la Sincronización Diferida.
+ */
+function setupNetworkListeners() {
+    window.addEventListener('online', () => {
+        document.body.classList.remove('offline-mode');
+        syncPendingRatings(); // Dispara la sincronización al volver la red
+    });
+
+    window.addEventListener('offline', () => {
+        document.body.classList.add('offline-mode');
+        console.warn('Estás navegando sin conexión. Los cambios se guardarán localmente.');
+    });
+}
 
 function initThemeToggle() {
     const themeBtn = document.getElementById('theme-toggle');
@@ -45,8 +61,8 @@ function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('../sw.js')
-                .then(registration => console.log('SW registrado:', registration.scope))
-                .catch(error => console.log('Error SW:', error));
+                .then(registration => console.log('SW registrado con alcance:', registration.scope))
+                .catch(error => console.log('Error al registrar SW:', error));
         });
     }
 }
