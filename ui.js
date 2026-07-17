@@ -1,5 +1,6 @@
 // js/ui.js
 import { searchArtist, getArtistAlbums } from './api.js';
+import { toggleFavorite } from './storage.js';
 
 /**
  * Inicializa y renderiza la vista del buscador en el contenedor principal.
@@ -31,17 +32,17 @@ async function handleSearch(event) {
     const spinner = document.getElementById('global-spinner');
     const resultsContainer = document.getElementById('results-container');
 
-    // 1. Limpiar resultados previos y mostrar el spinner
+    // Limpiar resultados previos y mostrar el spinner
     resultsContainer.innerHTML = '';
     spinner.classList.remove('hidden');
 
-    // 2. Realizar petición asíncrona a la API
+    // Realizar petición asíncrona a la API
     const results = await searchArtist(query);
 
-    // 3. Ocultar el spinner al recibir respuesta
+    // Ocultar el spinner al recibir respuesta
     spinner.classList.add('hidden');
 
-    // 4. Gestión de estados vacíos (Resultados no encontrados)
+    // Gestión de estados vacíos (Resultados no encontrados)
     if (!results || results.length === 0) {
         resultsContainer.innerHTML = `
             <div class="empty-state">
@@ -52,7 +53,7 @@ async function handleSearch(event) {
         return;
     }
 
-    // 5. Renderizar los resultados si existen
+    // Renderizar los resultados si existen
     renderArtists(results, resultsContainer);
 }
 
@@ -88,15 +89,10 @@ async function loadArtistDetail(artistId, artistName) {
     const appContainer = document.getElementById('app-container');
     const spinner = document.getElementById('global-spinner');
 
-    // Mostrar spinner mientras cargan los álbumes
     spinner.classList.remove('hidden');
-
     const albums = await getArtistAlbums(artistId);
-
-    // Ocultar spinner tras la respuesta
     spinner.classList.add('hidden');
 
-    // Inyectar el HTML del contenedor de álbumes
     appContainer.innerHTML = `
         <div class="detail-section">
             <button id="btn-back" class="btn-secondary">⬅ Volver al Buscador</button>
@@ -107,23 +103,20 @@ async function loadArtistDetail(artistId, artistName) {
         </div>
     `;
 
-    // Botón para regresar al buscador principal
     document.getElementById('btn-back').addEventListener('click', initSearch);
 
     const albumsContainer = document.getElementById('albums-container');
     
-    // Validar si el artista no tiene álbumes registrados
     if (!albums || albums.length === 0) {
         albumsContainer.innerHTML = `<p class="empty-state">No se encontraron álbumes para este artista.</p>`;
         return;
     }
 
-    // Renderizar los álbumes en la vista
     renderAlbums(albums, albumsContainer);
 }
 
 /**
- * Genera el HTML para las tarjetas de los álbumes.
+ * Genera el HTML para las tarjetas de los álbumes y vincula los eventos.
  */
 function renderAlbums(albums, container) {
     const html = albums.map(album => `
@@ -139,4 +132,19 @@ function renderAlbums(albums, container) {
     `).join('');
 
     container.innerHTML = html;
+
+    // Conectar el botón de Guardar en Favoritos
+    const favButtons = document.querySelectorAll('.btn-fav');
+    favButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            // Extraer los datos del dataset del botón
+            const albumData = {
+                id: e.target.getAttribute('data-id'),
+                title: e.target.getAttribute('data-title'),
+                cover_medium: e.target.getAttribute('data-cover')
+            };
+            // Llamar a nuestra función de guardado
+            toggleFavorite(albumData);
+        });
+    });
 }
