@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deezer-Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="light-mode"> <!-- Inicia en modo claro por defecto -->
+
+    <!-- Header con navegación y botón de Modo Oscuro/Claro -->
+    <header>
+        <h1>Deezer-Manager</h1>
+        <nav id="main-nav" class="hidden">
+            <button id="btn-search">Buscador</button>
+            <button id="btn-my-albums">Mis Álbumes</button>
+            <button id="btn-logout">Cerrar Sesión</button>
+        </nav>
+        <button id="theme-toggle">🌙 Cambiar Tema</button>
+    </header>
+
+    <!-- Contenedor Principal donde inyectaremos las vistas con JS -->
+    <main id="app-container">
+        <!-- El formulario de login o las vistas musicales se renderizarán aquí -->
+    </main>
+
+    <!-- Spinner Global (Oculto por defecto) -->
+    <div id="global-spinner" class="hidden">
+        <div class="spinner"></div>
+        <p>Cargando...</p>
+    </div>
+
+    <!-- Scripts (Usamos type="module" para poder importar/exportar entre archivos JS) -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
